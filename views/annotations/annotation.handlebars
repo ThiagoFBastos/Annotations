@@ -1,0 +1,80 @@
+<div class="modal fade" id="tagsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Categorias</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <ul>
+                {{#each annotation.tags}}
+                    <li>
+                        <a class = "btn btn-link" href = "/tags/{{_id}}">{{name}}</a>
+                    </li>
+                {{/each}}
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+          </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Ação</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <b>Tem certeza que dejesa excluir esta anotação?</b><br>
+            Essa ação não poderá ser desfeita.
+          </div>
+          <div class="modal-footer">
+            <a class="btn btn-danger" href = "/annotations/delete/{{annotation._id}}">Deletar</a>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+    </div>
+</div>
+
+<div class = "container">
+    <h1 class = "text-center">{{annotation.title}}</h1>
+    <hr>
+    <div class = "row">
+        <div class = "col">
+            Criado em
+        </div>
+        <div class = "col">
+            {{annotation.createdAt}}
+        </div>
+    </div>
+    {{#if annotation.tags}}
+        <hr>
+        <div class = "row">
+            <div class = "col">
+                Tags
+            </div>
+            <div class = "col">
+                {{#each partial_tags}}
+                    <a class = "btn btn-sm btn-success" href = "/tags/{{_id}}"> {{name}} </a>
+                {{/each}}
+                {{#if hasMoreThanThree}}
+                    <a class="btn btn-link" data-bs-toggle="modal" data-bs-target="#tagsModal"> ... </a>
+                {{/if}}
+            </div>
+        </div>
+    {{/if}}
+    <hr>
+    <div class = "text-end">
+        <a class = "btn btn-warning btn-sm"  href = "/annotations/edit/{{annotation._id}}">editar campos</a>
+        <button class = "btn btn-danger btn-sm"  data-bs-toggle="modal" data-bs-target="#deleteModal">excluir anotação</button>
+    </div>
+    <hr>
+    <h2 class = "text-center">Descrição</h2>
+    <p class = "text-center">
+        {{annotation.description}}
+    </p>
+</div>

@@ -1,0 +1,56 @@
+<div class = "container">
+    <br>
+    <br>
+    <div class = "row">
+        <div class = "col">
+            <h1 class = "text-center">Edite a anotação</h1>
+            <hr>
+            <p class = "text-lead text-center">
+                Página responsável pela a edição de uma determinada anotação
+            </p>
+        </div>
+        <div class = "col">
+            <form action = "/annotations/edit/{{annotation._id}}" method = "post" autocomplete = "off">
+                <div class = "form-group">
+                    <label for = "name">Título</label>
+                    {{#if titleErrors}}
+                        <input value = "{{annotation.title}}" class = "form-control is-invalid" name = "title">
+                        <div class="invalid-feedback">
+                            {{#each titleErrors}}
+                                {{msg}}
+                            {{/each}}
+                        </div>
+                    {{else}}
+                        <input value = "{{annotation.title}}" class = "form-control" name = "title">
+                    {{/if}}
+                </div>
+                <br>
+                <div class = "form-group">
+                    <label for = "description">Descrição</label>
+                    {{#if descriptionErrors}}
+                        <textarea rows = "5" class = "form-control is-invalid" name = "description">{{annotation.description}}</textarea>
+                        <div class="invalid-feedback">
+                            {{#each descriptionErrors}}
+                                {{msg}}
+                            {{/each}}
+                        </div>
+                    {{else}}
+                        <textarea rows = "5" class = "form-control" name = "description">{{annotation.description}}</textarea>
+                    {{/if}}
+                </div>
+                <div class = "form-group">
+                    <label for = "tags">Tags</label>
+                    <select name = "tags" class = "form-control" multiple>
+                        {{#each tags}}
+                            <option value = "{{_id}}" {{#if selected}}selected{{/if}}>{{name}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <br>
+                <div class="d-grid gap-2 mx-auto">
+                    <button class="btn btn-primary" type = "submit">Editar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

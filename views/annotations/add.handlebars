@@ -1,0 +1,63 @@
+<div class = "container">
+    <br>
+    <br>
+    <div class = "row">
+        <div class = "col">
+            <h1 class = "text-center">Cadastre uma anotação</h1>
+            <hr>
+            <p class = "lead text-center">
+                Aqui é o lugar onde você pode cadastrar as suas
+                anotações para poder usá-las no futuro
+            </p>
+        </div>
+        <div class = "col">
+            {{#if alert}}
+		        <div class = "alert {{alert.class}}" role="alert">
+	          		{{alert.message}}
+		        </div>
+	        {{/if}}
+            <form action = "/annotations/add" method = "post" autocomplete = "off">
+                <div class = "form-group">
+                    <label for = "title">Título</label>
+                    {{#if titleErrors}}
+                        <input class = "form-control is-invalid" name = "title">
+                        <div class="invalid-feedback">
+                            {{#each titleErrors}}
+                                {{msg}}
+                            {{/each}}
+                        </div>
+                    {{else}}
+                        <input class = "form-control" name = "title">
+                    {{/if}}
+                </div>
+                <br>
+                <div class = "form-group">
+                    <label for = "description">Descrição</label>
+                    {{#if descriptionErrors}}
+                        <textarea rows = "5" class = "form-control is-invalid" name = "description"></textarea>
+                        <div class="invalid-feedback">
+                            {{#each descriptionErrors}}
+                                {{msg}}
+                            {{/each}}
+                        </div>
+                    {{else}}
+                        <textarea rows = "5" class = "form-control" name = "description"></textarea>
+                    {{/if}}
+                </div>
+                <br>
+                <div class = "form-group">
+                    <label for = "tags">Tags</label>
+                    <select name = "tags" class = "form-control" multiple>
+                        {{#each tags}}
+                            <option value = "{{_id}}">{{name}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+                <br>
+                <div class="d-grid gap-2 mx-auto">
+                    <button class="btn btn-primary" type = "submit">Cadastrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,57 @@
+<div class = "container">
+    <br>
+    <br>
+    <div class = "row">
+        <div class = "col">
+            <h1 class = "text-center">Annotations</h1>
+            <hr>
+            <p class = "lead text-center">
+                O site para você criar e armazenar suas anotações
+            </p>
+        </div>
+        <div class = "col">
+            {{#if alert}}
+		        <div class = "alert {{alert.class}}" role="alert">
+	          		{{alert.message}}
+		        </div>
+	        {{/if}}
+            <form method = "post" action = "/users/login" autocomplete = "off">
+		        <div class = "form-group">
+			        <label>Email</label>
+                    {{#if emailErrors}}
+			            <input type = "email" class = "form-control is-invalid" name = "email" placeholder = "Email..."/>
+                        <div class="invalid-feedback">
+                            {{#each emailErrors}}
+                                {{msg}} <br>
+                            {{/each}}
+                        </div>
+                    {{else}}
+			            <input type = "email" class = "form-control" name = "email" placeholder = "Email..."/>
+                    {{/if}}
+		        </div>
+                <br>
+		        <div class = "form-group">
+			        <label>Senha</label>
+                    {{#if passwordErrors}}
+			            <input type = "password" class = "form-control is-invalid" name = "password" placeholder = "Senha..."/>
+                        <div class="invalid-feedback">
+                            {{#each passwordErrors}}
+                                {{msg}} <br>
+                            {{/each}}
+                        </div>
+                    {{else}}
+                        <input type = "password" class = "form-control" name = "password" placeholder = "Senha..."/>
+                    {{/if}}
+		        </div>
+                <br>
+                <div class="d-grid gap-2 mx-auto">
+                    <button class="btn btn-primary" type = "submit">Login</button>
+                </div>
+	        </form>
+            <div class = "text-end">
+                <a href = "/users/register">Quer se registrar?</a>
+            </div>
+        </div>
+    </div>
+	
+</div>

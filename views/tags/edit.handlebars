@@ -1,0 +1,53 @@
+<div class = "container">
+    <br>
+    <br>
+    <div class = "row">
+        <div class = "col">
+            <h1 class = "text-center">Edite a sua tag</h1>
+            <hr>
+            <p class = "lead text-center">
+                Página responsável por editar as suas tags
+            </p>
+        </div>
+        <div class = "col">
+            {{#if alert}}
+		        <div class = "alert {{alert.class}}" role="alert">
+	          		{{alert.message}}
+		        </div>
+	        {{/if}}
+            <form action = "/tags/edit/{{tag._id}}" method = "post" autocomplete = "off">
+                <div class = "form-group">
+                    <label for = "name">Nome</label>
+                    {{#if nameErrors}}
+                        <input class = "form-control is-invalid" name = "name" value = "{{tag.name}}">
+                        <div class="invalid-feedback">
+                            {{#each nameErrors}}
+                                {{msg}} <br>
+                            {{/each}}
+                        </div>
+                    {{else}}
+                        <input class = "form-control" name = "name" value = "{{tag.name}}">
+                    {{/if}}
+                </div>
+                <br>
+                <div class = "form-group">
+                    <label for = "description">Descrição</label>
+                    {{#if descriptionErrors}}
+                        <textarea rows = "5" class = "form-control is-invalid" name = "description">{{tag.description}}</textarea>
+                        <div class="invalid-feedback">
+                            {{#each descriptionErrors}}
+                                {{msg}} <br>
+                            {{/each}}                    
+                        </div>
+                    {{else}}
+                        <textarea rows = "5" class = "form-control" name = "description">{{tag.description}}</textarea>
+                    {{/if}}
+                </div>
+                <br>
+                <div class="d-grid gap-2 mx-auto">
+                    <button class="btn btn-primary" type = "submit">Editar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

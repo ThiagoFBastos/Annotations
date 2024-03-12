@@ -1,0 +1,54 @@
+<div class = "container">
+    <br>
+    <br>
+    <div class = "row">
+        <div class = "col">
+            <h1 class = "text-center">Cadastre uma tag</h1>
+            <hr>
+            <p class = "lead text-center">
+                Cadastre aqui uma tag que você poderá vincular às suas
+                anotações para poder encontrá-las de forma mais fácil
+            </p>
+        </div>
+        <div class = "col">
+            {{#if alert}}
+		        <div class = "alert {{alert.class}}" role="alert">
+	          		{{alert.message}}
+		        </div>
+	        {{/if}}
+            <form action = "/tags/add" method = "post" autocomplete = "off">
+                <div class = "form-group">
+                    <label for = "name">Nome</label>
+                    {{#if nameErrors}}
+                        <input class = "form-control is-invalid" name = "name">
+                        <div class="invalid-feedback">
+                            {{#each nameErrors}}
+                                {{msg}} <br>
+                            {{/each}}
+                        </div>
+                    {{else}}
+                        <input class = "form-control" name = "name">
+                    {{/if}}
+                </div>
+                <br>
+                <div class = "form-group">
+                    <label for = "description">Descrição</label>
+                    {{#if descriptionErrors}}
+                        <textarea rows = "5" class = "form-control is-invalid" name = "description"></textarea>
+                        <div class="invalid-feedback">
+                            {{#each descriptionErrors}}
+                                {{msg}} <br>
+                            {{/each}}                    
+                        </div>
+                    {{else}}
+                        <textarea rows = "5" class = "form-control" name = "description"></textarea>
+                    {{/if}}
+                </div>
+                <br>
+                <div class="d-grid gap-2 mx-auto">
+                    <button class="btn btn-primary" type = "submit">Cadastrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

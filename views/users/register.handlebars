@@ -1,0 +1,82 @@
+<div class = "container">
+    <br>
+    <br>
+    <div class = "row">
+        <div class = "col">
+            <h1 class = "text-center">Resgistro</h1>
+            <hr>
+            <p class = "lead text-center">
+                Cadastre no annotations e desfrute de um lugar onde
+                você pode colocar suas anotações em dia
+            </p>
+        </div>
+        <div class = "col">
+            {{#if alert}}
+		        <div class = "alert {{alert.class}}" role="alert">
+	          		{{alert.message}}
+		        </div>
+	        {{/if}}
+            <form action = "/users/register" method = "post" autocomplete = "off">
+		        <div class="form-group">
+			        <label>Primeiro Nome</label>
+                    {{#if firstNameErrors}}
+			            <input type="text" name="first_name" placeholder="Primeiro Nome..." class="form-control is-invalid">
+                        <div class="invalid-feedback">
+                            {{#each firstNameErrors}}
+                                {{msg}} <br>
+                            {{/each}}
+                        </div>
+                    {{else}}
+			            <input type="text" name="first_name" placeholder="Primeiro Nome..." class="form-control">
+                    {{/if}}
+		        </div>
+                <br>
+		        <div class="form-group">
+			        <label>Último Nome</label>
+                    {{#if lastNameErrors}}
+			            <input type="text" name="last_name" placeholder="Último Nome..." class="form-control is-invalid">
+                        <div class="invalid-feedback">
+                            {{#each lastNameErrors}}
+                                {{msg}} <br>
+                            {{/each}}
+                        </div>
+                    {{else}}
+			            <input type="text" name="last_name" placeholder="Último Nome..." class="form-control">
+                    {{/if}}
+		        </div>
+                <br>
+		        <div class="form-group">
+			        <label>Email</label>
+                    {{#if emailErrors}}
+			            <input type="email" name="email" placeholder="Email..." class="form-control is-invalid">
+                        <div class="invalid-feedback">
+                            {{#each emailErrors}}
+                                {{msg}} <br>
+                            {{/each}}
+                        </div>
+                    {{else}}
+			            <input type="email" name="email" placeholder="Email..." class="form-control">
+                    {{/if}}
+		        </div>
+                <br>
+		        <div class="form-group">
+			        <label>Senha</label>
+                    {{#if passwordErrors}}
+			            <input type="password" name="password" placeholder="Senha..." class="form-control is-invalid">
+                        <div class="invalid-feedback">
+                            {{#each passwordErrors}}
+                                {{msg}} <br>
+                            {{/each}}
+                        </div>
+                    {{else}}
+			            <input type="password" name="password" placeholder="Senha..." class="form-control">
+                    {{/if}}
+		        </div>
+                <br>
+                <div class="d-grid gap-2 mx-auto">
+                    <button class="btn btn-primary" type = "submit">Cadastrar</button>
+                </div>
+	        </form>
+        </div>
+    </div>
+</div>
