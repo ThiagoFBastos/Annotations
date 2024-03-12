@@ -18,11 +18,7 @@ const UserSchema = Schema({
     password: {
         type: String,
         require: true
-    },
-    annotations: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Annotations'
-    }]
+    }
 });
 
 const User = mongoose.model("Users", UserSchema);
