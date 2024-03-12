@@ -1,4 +1,4 @@
-# Annotation
+# Annotations
 Site para guardar anotações para usuários cadastrados
 
 ## Requisitos
