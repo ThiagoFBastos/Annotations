@@ -8,6 +8,8 @@ const annotationValidators = require('../validators/annotations');
 
 router.use(annotationsMiddlewares.Authentication);
 
+router.param('annotationId', annotationsMiddlewares.ExistsAnnotation);
+
 router.get('/', annotationsControllers.AllAnnotations);
 
 router.get('/search', annotationsControllers.Search);

@@ -11,8 +11,7 @@ exports.AllAnnotations = async (req, res, next) => {
         let page = parseInt(req.query.page ?? 1);
         let countPages = Math.ceil((await Annotation.find({user: new ObjectId(req.session.user._id)}).count()) / PAGINATION);
         let annotations = await Annotation.find({user: req.session.user._id}).skip((page - 1) * PAGINATION).limit(PAGINATION);
-        let navigationPages = [];
-        let delta;
+        let navigationPages = [], delta;
 
         if(countPages < 5 || page <= 2) delta = page - 1;
         else if(page - 2 >= 1 && page + 2 <= countPages) delta = 2;
@@ -58,22 +57,12 @@ exports.AddAnnotation = async (req, res, next) => {
     try {
         const errors = validationResult(req);
 
-        if(!errors.isEmpty()) {
-            let titleErrors = errors.errors.filter(error => error.path == 'title');
-            let descriptionErrors = errors.errors.filter(error => error.path == 'description');
-
-            res.render('annotations/add', {
-                title: 'Adicionar anotação',
-                tags: await Tag.find({user: req.session.user._id}),
-                titleErrors: titleErrors,
-                descriptionErrors: descriptionErrors
-            });
-        } else {
+        if(errors.isEmpty()) {
             const ObjectId = mongoose.Types.ObjectId;
 
             [{title, description, tags} = req.body];
 
-            if(typeof(tags) != 'object')
+            if(!(tags instanceof Array))
                 tags = [tags];
 
             tags = tags.map(id => new ObjectId(id));
@@ -88,6 +77,16 @@ exports.AddAnnotation = async (req, res, next) => {
                     message: 'A anotação foi criada com sucesso'
                 }
             });
+        } else {
+            let titleErrors = errors.errors.filter(error => error.path == 'title');
+            let descriptionErrors = errors.errors.filter(error => error.path == 'description');
+
+            res.render('annotations/add', {
+                title: 'Adicionar anotação',
+                tags: await Tag.find({user: req.session.user._id}),
+                titleErrors: titleErrors,
+                descriptionErrors: descriptionErrors
+            });
         }
     } catch(e) {
         next(e);
@@ -96,21 +95,16 @@ exports.AddAnnotation = async (req, res, next) => {
 
 exports.Profile = async (req, res, next) => {
     try {
-        let annotation = await Annotation.findOne({$and : [{_id: req.params.annotationId}, {user: req.session.user._id}]}).populate('tags');
+        let annotation = await req.annotation.populate('tags');
+        let partial_tags = annotation.tags.slice(0, 3);
+        let hasMoreThanThree = annotation.tags.length > 3;
 
-        if(annotation == null)
-            res.status(404).render('not_found');
-        else {
-            let partial_tags = annotation.tags.slice(0, 3);
-            let hasMoreThanThree = annotation.tags.length > 3;
-
-            res.render('annotations/annotation', {
-                title: annotation.title,
-                annotation: annotation,
-                partial_tags: partial_tags,
-                hasMoreThanThree: hasMoreThanThree
-            })
-        }
+        res.render('annotations/annotation', {
+            title: annotation.title,
+            annotation: annotation,
+            partial_tags: partial_tags,
+            hasMoreThanThree: hasMoreThanThree
+        });
     } catch(e) {
         next(e);
     }
@@ -118,21 +112,18 @@ exports.Profile = async (req, res, next) => {
 
 exports.EditPage = async (req, res, next) => {
     try {
-        let annotation = await Annotation.findOne({$and: [{_id: req.params.annotationId}, {user: req.session.user._id}]}).populate('tags');
+        let annotation = await req.annotation.populate('tags');
 
-        if(annotation == null)
-            res.status(404).render('not_found');
-        else {
-            let tags = (await Tag.find({user: req.session.user._id})).map(tag => {
-                tag.selected = annotation.tags.find(value => value.equals(tag._id)) != undefined;
-                return tag;
-            });
-            res.render('annotations/edit', {
-                title: `${annotation.title} | editar`,
-                annotation: annotation,
-                tags: tags
-            });
-        }
+        let tags = (await Tag.find({user: req.session.user._id})).map(tag => {
+            tag.selected = annotation.tags.find(value => value.equals(tag._id)) != undefined;
+            return tag;
+        });
+
+        res.render('annotations/edit', {
+            title: `${annotation.title} | editar`,
+            annotation: annotation,
+            tags: tags
+        });
     } catch(e) {
         next(e);
     }
@@ -140,42 +131,52 @@ exports.EditPage = async (req, res, next) => {
 
 exports.Edit = async (req, res, next) => {
     try {
-        if(await Annotation.exists({$and: [{_id: req.params.annotationId}, {user: req.session.user._id}]})) {
-            const errors = validationResult(req);
+        const errors = validationResult(req);
 
-            if(errors.isEmpty()) {
-                const ObjectId = mongoose.Types.ObjectId;
+        if(errors.isEmpty()) {
+            const ObjectId = mongoose.Types.ObjectId;
 
-                [{title, description, tags} = req.body];
+            [{title, description, tags} = req.body];
 
-                if(typeof(tags) != 'object')
-                    tags = [tags];
+            if(!(tags instanceof Array))
+                tags = [tags];
 
-                tags = tags.map(id => new ObjectId(id));
-                await Annotation.findByIdAndUpdate(req.params.annotationId, {$set: {title: title, description: description, tags: tags}});
-                
-                res.redirect('/annotations/' + req.params.annotationId);
-            } else {
-                let titleErrors = errors.errors.filter(error => error.path == 'title');
-                let descriptionErrors = errors.errors.filter(error => error.path == 'description');
+            tags = tags.map(id => new ObjectId(id));
+            await Annotation.findByIdAndUpdate(req.params.annotationId, {$set: {title: title, description: description, tags: tags}});
+            
+            let annotation = await Annotation.findById(req.params.annotationId).populate('tags');
 
-                let annotation = await Annotation.findById(req.params.annotationId).populate('tags');
-
-                let tags = (await Tag.find({user: req.session.user._id})).map(tag => {
+            res.render('annotations/edit', {
+                title: `${annotation.title} | editar`,
+                annotation: annotation,
+                tags: (await Tag.find({user: req.session.user._id})).map(tag => {
                     tag.selected = annotation.tags.find(value => value.equals(tag._id)) != undefined;
                     return tag;
-                });
+                }),
+                alert: {
+                    class: 'alert-success',
+                    message: 'A anotação foi alterada com sucesso'
+                }
+            });
+        } else {
+            let titleErrors = errors.errors.filter(error => error.path == 'title');
+            let descriptionErrors = errors.errors.filter(error => error.path == 'description');
 
-                res.render('annotations/edit', {
-                    title: `${annotation.title} | editar`,
-                    annotation: annotation,
-                    tags: tags,
-                    titleErrors: titleErrors,
-                    descriptionErrors: descriptionErrors
-                });
-            }
-        } else
-            res.status(404).render('not_found');
+            let annotation = await req.annotation.populate('tags');
+
+            let tags = (await Tag.find({user: req.session.user._id})).map(tag => {
+                tag.selected = annotation.tags.find(value => value.equals(tag._id)) != undefined;
+                return tag;
+            });
+
+            res.render('annotations/edit', {
+                title: `${annotation.title} | editar`,
+                annotation: annotation,
+                tags: tags,
+                titleErrors: titleErrors,
+                descriptionErrors: descriptionErrors
+            });
+        }
     } catch(e) {
         next(e);
     }
@@ -183,11 +184,8 @@ exports.Edit = async (req, res, next) => {
 
 exports.Delete = async (req, res, next) => {
     try {
-        if(await Annotation.exists({$and: [{_id: req.params.annotationId}, {user: req.session.user._id}]})) {
-            await Annotation.findByIdAndDelete(req.params.annotationId);
-            res.redirect('/');
-        } else
-            res.status(404).render('not_found');
+        await Annotation.findByIdAndDelete(req.params.annotationId);
+        res.redirect('/');
     } catch(e) {
         next(e);
     }
@@ -200,8 +198,7 @@ exports.Search = async (req, res, next) => {
         let keywords = req.query.keywords;
         let annotations = await Annotation.find({$and: [{title: {$regex: keywords, $options: 'i'}}, {user: req.session.user._id}]}).skip((page - 1) * PAGINATION).limit(PAGINATION);
         let countPages = Math.ceil((await Annotation.find({$and: [{title: {$regex: keywords, $options: 'i'}}, {user: new ObjectId(req.session.user._id)}]}).count()) / PAGINATION);
-        let navigationPages = [];
-        let delta;
+        let navigationPages = [], delta;
 
         if(countPages < 5 || page <= 2) delta = page - 1;
         else if(page - 2 >= 1 && page + 2 <= countPages) delta = 2;

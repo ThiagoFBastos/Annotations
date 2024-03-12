@@ -26,6 +26,14 @@ const AnnotationSchema = Schema({
     }
 });
 
+AnnotationSchema.virtual('date').get(function() {
+    return this.createdAt.toLocaleDateString();
+});
+
+AnnotationSchema.virtual('url').get(function() {
+    return `/annotations/${this._id}`;
+});
+
 const Annotation = mongoose.model("Annotations", AnnotationSchema);
 
 module.exports = Annotation;

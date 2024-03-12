@@ -79,6 +79,18 @@ exports.Logout = async (req, res) => {
 	res.redirect('/users/login');
 };
 
+exports.ProfilePage = (req, res) => {
+    res.render('users/profile', {title: 'Perfil', profileTab: true});
+};
+
+exports.LoginPage = (req, res) => {
+    res.render('users/login', {title: 'Login'});
+};
+
+exports.RegisterPage = (req, res) => {
+    res.render('users/register', {title: 'Registro'});
+};
+
 exports.ChangeProfile = async (req, res, next) => {
 	try {
         const errors = validationResult(req);
@@ -95,10 +107,20 @@ exports.ChangeProfile = async (req, res, next) => {
 				    },
                     profileTab: true
 			    });
-		    } else {
+            } else if(await User.exists({email: email})) {
+                res.render('users/profile', {
+				    title: 'Perfil',
+				    alertProfile: {
+					    class: 'alert-danger',
+					    message: 'O email já está em uso'
+				    },
+                    profileTab: true
+			    });
+            } else {
 			    await User.findByIdAndUpdate(req.session.user._id, {$set: {first_name: first_name, last_name: last_name, email: email}});
 
 			    req.session.user = await User.findById(req.session.user._id);
+                res.locals.user = req.session.user;
 
 			    res.render('users/profile', {
 				    title: 'Perfil',

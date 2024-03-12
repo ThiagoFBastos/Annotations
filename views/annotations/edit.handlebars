@@ -8,8 +8,16 @@
             <p class = "text-lead text-center">
                 Página responsável pela a edição de uma determinada anotação
             </p>
+            <div class = "text-center">
+                <a href = "{{annotation.url}}">&#8592; volte</a>
+            </div>
         </div>
         <div class = "col">
+            {{#if alert}}
+		        <div class = "alert {{alert.class}}" role="alert">
+	          		{{alert.message}}
+		        </div>
+	        {{/if}}
             <form action = "/annotations/edit/{{annotation._id}}" method = "post" autocomplete = "off">
                 <div class = "form-group">
                     <label for = "name">Título</label>

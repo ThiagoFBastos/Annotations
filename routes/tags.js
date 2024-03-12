@@ -7,9 +7,11 @@ const router = express.Router();
 
 router.use(tagsMiddlewares.Authentication);
 
+router.param('tagId', tagsMiddlewares.ExistsTag);
+
 router.get('/', tagsControllers.AllTags);
 
-router.get('/add', (req, res) => res.render('tags/add', {title: 'Adicionar Tag'}));
+router.get('/add', tagsControllers.AddTagPage);
 router.post('/add', tagsValidators.addTagValidators, tagsControllers.AddTag);
 
 router.get('/delete/:tagId', tagsControllers.Delete);
