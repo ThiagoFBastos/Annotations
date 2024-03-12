@@ -11,4 +11,5 @@ Site para guardar anotações para usuários cadastrados
 PORT=8000
 ```
 2. No terminal insira: npm install
-3. Após isso, insira no terminal: node index.js
+3. Após isso: insire docker compose up 
+4. Após isso, insira no terminal: node index.js
