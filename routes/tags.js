@@ -12,12 +12,12 @@ router.param('tagId', tagsMiddlewares.ExistsTag);
 router.get('/', tagsControllers.AllTags);
 
 router.get('/add', tagsControllers.AddTagPage);
-router.post('/add', tagsValidators.addTagValidators, tagsControllers.AddTag);
+router.post('/add', tagsValidators.addTagValidators, tagsMiddlewares.AddTagValidation, tagsControllers.AddTag);
 
 router.get('/delete/:tagId', tagsControllers.Delete);
 
 router.get('/edit/:tagId', tagsControllers.EditPage);
-router.post('/edit/:tagId', tagsValidators.addTagValidators, tagsControllers.Edit);
+router.post('/edit/:tagId', tagsValidators.addTagValidators, tagsMiddlewares.EditTagValidation, tagsControllers.Edit);
 
 router.get('/:tagId', tagsControllers.Profile);
 

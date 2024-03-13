@@ -1,4 +1,5 @@
 const Tag = require('../models/tags');
+const {validationResult} = require('express-validator');
 
 exports.Authentication = (req, res, next) => {
     if(req.session.user == undefined)
@@ -19,5 +20,40 @@ exports.ExistsTag = async (req, res, next, id) => {
         }
     } catch(e) {
         next(e);
+    }
+};
+
+exports.AddTagValidation = (req, res, next) => {
+    const errors = validationResult(req);
+
+    if(errors.isEmpty())
+        next();
+    else {
+        let nameErrors = errors.errors.filter(error => error.path == 'name');
+        let descriptionErrors = errors.errors.filter(error => error.path == 'description');
+
+        res.render('tags/add', {
+            title: 'Adicionar tag',
+            nameErrors: nameErrors,
+            descriptionErrors: descriptionErrors
+        });
+    }
+};
+
+exports.EditTagValidation = (req, res, next) => {
+    const errors = validationResult(req);
+
+    if(errors.isEmpty())
+        next();
+    else {
+        let nameErrors = errors.errors.filter(error => error.path == 'name');
+        let descriptionErrors = errors.errors.filter(error => error.path == 'description');
+
+        res.render('tags/edit', {
+            title:  `${req.tag.name} | editar`,
+            tag: req.tag,
+            nameErrors: nameErrors,
+            descriptionErrors: descriptionErrors
+        });
     }
 };

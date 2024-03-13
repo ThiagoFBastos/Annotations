@@ -6,17 +6,17 @@ const userValidators = require('../validators/users');
 const router = express.Router();
 
 router.get('/profile', usersMiddlewares.Authentication, usersControllers.ProfilePage);
-router.post('/profile', usersMiddlewares.Authentication, userValidators.updateUserValidators, usersControllers.ChangeProfile);
+router.post('/profile', usersMiddlewares.Authentication, userValidators.updateUserValidators, usersMiddlewares.ChangeProfileValidation, usersControllers.ChangeProfile);
 
 router.get('/login', usersMiddlewares.AlredyAuthenticated, usersControllers.LoginPage);
 
-router.post('/login', usersMiddlewares.AlredyAuthenticated, userValidators.loginUserValidators, usersControllers.Login);
+router.post('/login', usersMiddlewares.AlredyAuthenticated, userValidators.loginUserValidators, usersMiddlewares.LoginValidation, usersControllers.Login);
 
 router.get('/logout', usersMiddlewares.Authentication, usersControllers.Logout);
 
 router.get('/register', usersMiddlewares.AlredyAuthenticated, usersControllers.RegisterPage);
-router.post('/register', usersMiddlewares.AlredyAuthenticated, userValidators.registerUserValidators, usersControllers.Register);
+router.post('/register', usersMiddlewares.AlredyAuthenticated, userValidators.registerUserValidators, usersMiddlewares.RegisterValidation, usersControllers.Register);
 
-router.post('/password', userValidators.passwordChangeUserValidators, usersControllers.ChangePassword);
+router.post('/password', userValidators.passwordChangeUserValidators, usersMiddlewares.ChangePasswordValidation, usersControllers.ChangePassword);
 
 module.exports = router;

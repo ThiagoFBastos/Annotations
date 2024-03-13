@@ -1,7 +1,6 @@
 const Tag = require('../models/tags');
 const Annotation = require('../models/annotations');
 const mongoose = require('../models/db');
-const {validationResult} = require('express-validator');
 
 const PAGINATION = 8;
 
@@ -67,30 +66,17 @@ exports.AddTagPage = (req, res) => {
 
 exports.AddTag = async (req, res, next) => {
     try {
-        const errors = validationResult(req);
+        const {name, description} = req.body;
+        let tag = new Tag({name: name, description: description, user: req.session.user._id});
+        await tag.save();
 
-        if(errors.isEmpty()) {
-            const {name, description} = req.body;
-            let tag = new Tag({name: name, description: description, user: req.session.user._id});
-            await tag.save();
-
-            res.render('tags/add', {
-                title: 'Adicionar tag',
-                alert: {
-                    class: 'alert-success',
-                    message: 'Tag adicionada com sucesso'
-                }
-            });
-        } else {
-            let nameErrors = errors.errors.filter(error => error.path == 'name');
-            let descriptionErrors = errors.errors.filter(error => error.path == 'description');
-
-            res.render('tags/add', {
-                title: 'Adicionar tag',
-                nameErrors: nameErrors,
-                descriptionErrors: descriptionErrors
-            });
-        }
+        res.render('tags/add', {
+            title: 'Adicionar tag',
+            alert: {
+                class: 'alert-success',
+                message: 'Tag adicionada com sucesso'
+            }
+        });
     } catch(e) {
         next(e);
     }
@@ -114,34 +100,20 @@ exports.EditPage = async (req, res, next) => {
 
 exports.Edit = async (req, res, next) => {
     try {
-        const errors = validationResult(req);
+        const {name, description} = req.body;
 
-        if(errors.isEmpty()) {
-            const {name, description} = req.body;
+        await Tag.findByIdAndUpdate(req.params.tagId, {$set: {name: name, description: description}});
 
-            await Tag.findByIdAndUpdate(req.params.tagId, {$set: {name: name, description: description}});
+        let tag = await Tag.findById(req.params.tagId);
 
-            let tag = await Tag.findById(req.params.tagId);
-
-            res.render('tags/edit', {
-                title: `${tag.name} | editar`,
-                tag: tag,
-                alert: {
-                    class: 'alert-success',
-                    message: 'Tag alterada com sucesso'
-                }
-            });
-        } else {
-            let nameErrors = errors.errors.filter(error => error.path == 'name');
-            let descriptionErrors = errors.errors.filter(error => error.path == 'description');
-
-            res.render('tags/edit', {
-                title:  `${req.tag.name} | editar`,
-                tag: req.tag,
-                nameErrors: nameErrors,
-                descriptionErrors: descriptionErrors
-            });
-        }
+        res.render('tags/edit', {
+            title: `${tag.name} | editar`,
+            tag: tag,
+            alert: {
+                class: 'alert-success',
+                message: 'Tag alterada com sucesso'
+            }
+        });
     } catch(e) {
         next(e);
     }

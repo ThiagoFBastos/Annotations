@@ -1,13 +1,12 @@
 const Annotation = require('../models/annotations');
 const Tag = require('../models/tags');
 const mongoose = require('../models/db');
-const {validationResult} = require('express-validator');
 
 const PAGINATION = 8;
 
 exports.AllAnnotations = async (req, res, next) => {
     try {
-        const ObjectId = mongoose.Types.ObjectId;
+        const {ObjectId} = mongoose.Types;
         let page = parseInt(req.query.page ?? 1);
         let countPages = Math.ceil((await Annotation.find({user: new ObjectId(req.session.user._id)}).count()) / PAGINATION);
         let annotations = await Annotation.find({user: req.session.user._id}).skip((page - 1) * PAGINATION).limit(PAGINATION);
@@ -55,39 +54,25 @@ exports.AddAnnotationPage = async (req, res, next) => {
 
 exports.AddAnnotation = async (req, res, next) => {
     try {
-        const errors = validationResult(req);
+        const {ObjectId} = mongoose.Types;
 
-        if(errors.isEmpty()) {
-            const ObjectId = mongoose.Types.ObjectId;
+        [{title, description, tags} = req.body];
 
-            [{title, description, tags} = req.body];
+        if(!(tags instanceof Array))
+            tags = [tags];
 
-            if(!(tags instanceof Array))
-                tags = [tags];
+        tags = tags.map(id => new ObjectId(id));
+        let annotation = new Annotation({title: title, description: description, tags: tags, user: req.session.user._id});
+        await annotation.save();
 
-            tags = tags.map(id => new ObjectId(id));
-            let annotation = new Annotation({title: title, description: description, tags: tags, user: req.session.user._id});
-            await annotation.save();
-
-            res.render('annotations/add', {
-                title: 'Adicionar anotação',
-                tags: await Tag.find({user: req.session.user._id}),
-                alert: {
-                    class: 'alert-success',
-                    message: 'A anotação foi criada com sucesso'
-                }
-            });
-        } else {
-            let titleErrors = errors.errors.filter(error => error.path == 'title');
-            let descriptionErrors = errors.errors.filter(error => error.path == 'description');
-
-            res.render('annotations/add', {
-                title: 'Adicionar anotação',
-                tags: await Tag.find({user: req.session.user._id}),
-                titleErrors: titleErrors,
-                descriptionErrors: descriptionErrors
-            });
-        }
+        res.render('annotations/add', {
+            title: 'Adicionar anotação',
+            tags: await Tag.find({user: req.session.user._id}),
+            alert: {
+                class: 'alert-success',
+                message: 'A anotação foi criada com sucesso'
+            }
+        });
     } catch(e) {
         next(e);
     }
@@ -131,52 +116,30 @@ exports.EditPage = async (req, res, next) => {
 
 exports.Edit = async (req, res, next) => {
     try {
-        const errors = validationResult(req);
+        const {ObjectId} = mongoose.Types;
 
-        if(errors.isEmpty()) {
-            const ObjectId = mongoose.Types.ObjectId;
+        [{title, description, tags} = req.body];
 
-            [{title, description, tags} = req.body];
+        if(!(tags instanceof Array))
+            tags = [tags];
 
-            if(!(tags instanceof Array))
-                tags = [tags];
+        tags = tags.map(id => new ObjectId(id));
+        await Annotation.findByIdAndUpdate(req.params.annotationId, {$set: {title: title, description: description, tags: tags}});
+        
+        let annotation = await Annotation.findById(req.params.annotationId).populate('tags');
 
-            tags = tags.map(id => new ObjectId(id));
-            await Annotation.findByIdAndUpdate(req.params.annotationId, {$set: {title: title, description: description, tags: tags}});
-            
-            let annotation = await Annotation.findById(req.params.annotationId).populate('tags');
-
-            res.render('annotations/edit', {
-                title: `${annotation.title} | editar`,
-                annotation: annotation,
-                tags: (await Tag.find({user: req.session.user._id})).map(tag => {
-                    tag.selected = annotation.tags.find(value => value.equals(tag._id)) != undefined;
-                    return tag;
-                }),
-                alert: {
-                    class: 'alert-success',
-                    message: 'A anotação foi alterada com sucesso'
-                }
-            });
-        } else {
-            let titleErrors = errors.errors.filter(error => error.path == 'title');
-            let descriptionErrors = errors.errors.filter(error => error.path == 'description');
-
-            let annotation = await req.annotation.populate('tags');
-
-            let tags = (await Tag.find({user: req.session.user._id})).map(tag => {
+        res.render('annotations/edit', {
+            title: `${annotation.title} | editar`,
+            annotation: annotation,
+            tags: (await Tag.find({user: req.session.user._id})).map(tag => {
                 tag.selected = annotation.tags.find(value => value.equals(tag._id)) != undefined;
                 return tag;
-            });
-
-            res.render('annotations/edit', {
-                title: `${annotation.title} | editar`,
-                annotation: annotation,
-                tags: tags,
-                titleErrors: titleErrors,
-                descriptionErrors: descriptionErrors
-            });
-        }
+            }),
+            alert: {
+                class: 'alert-success',
+                message: 'A anotação foi alterada com sucesso'
+            }
+        });
     } catch(e) {
         next(e);
     }
@@ -193,7 +156,7 @@ exports.Delete = async (req, res, next) => {
 
 exports.Search = async (req, res, next) => {
     try {
-        const ObjectId = mongoose.Types.ObjectId;
+        const {ObjectId} = mongoose.Types;
         let page = parseInt(req.query.page ?? 1);
         let keywords = req.query.keywords;
         let annotations = await Annotation.find({$and: [{title: {$regex: keywords, $options: 'i'}}, {user: req.session.user._id}]}).skip((page - 1) * PAGINATION).limit(PAGINATION);

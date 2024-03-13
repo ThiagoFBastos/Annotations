@@ -15,10 +15,10 @@ router.get('/', annotationsControllers.AllAnnotations);
 router.get('/search', annotationsControllers.Search);
 
 router.get('/add', annotationsControllers.AddAnnotationPage);
-router.post('/add', annotationValidators.addAnnotationValidators, annotationsControllers.AddAnnotation);
+router.post('/add', annotationValidators.addAnnotationValidators, annotationsMiddlewares.AddAnnotationValidation, annotationsControllers.AddAnnotation);
 
 router.get('/edit/:annotationId', annotationsControllers.EditPage);
-router.post('/edit/:annotationId', annotationValidators.addAnnotationValidators, annotationsControllers.Edit);
+router.post('/edit/:annotationId', annotationValidators.addAnnotationValidators, annotationsMiddlewares.EditAnnotationValidation, annotationsControllers.Edit);
 
 router.get('/delete/:annotationId', annotationsControllers.Delete);
 
