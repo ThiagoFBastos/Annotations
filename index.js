@@ -27,6 +27,8 @@ app.engine('handlebars', engine({defaultLayout: 'base', runtimeOptions: {
             allowProtoMethodsByDefault: true,
 }}));
 
+handlebars.registerHelper('mod', (a, b, c) => {return a % b == c});
+
 app.set('view engine', 'handlebars');
 app.use(bodyParser.urlencoded({extended: false}));
 

@@ -6,16 +6,9 @@ const asyncHandler = require('express-async-handler')
 const PAGINATION = 8;
 
 exports.AllTags = asyncHandler(async (req, res, next) => {
-    let tags = await Tag.find({user: req.session.user._id});
-    let blocks = [];
-    for(let i = 0; i < tags.length; ++i) {
-        if(i % 4 == 0)
-            blocks.push([]);
-        blocks[i >> 2].push(tags[i]);
-    }
     res.render('tags/all', {
         title: 'Todas as tags',
-        tags: blocks
+        tags: await Tag.find({user: req.session.user._id})
     });
 });
 

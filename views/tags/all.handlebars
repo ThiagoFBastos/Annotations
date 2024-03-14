@@ -1,11 +1,15 @@
 <div class = "container">
     {{#each tags}}
+        {{#if (mod @index 4 0)}}
         <div class = "row">
-            {{#each this}}
-                <div class = "col">
-                    <a href = "{{url}}" class = "btn btn-link">{{name}}</a>
-                </div>
-            {{/each}}
+        {{/if}}
+        <div class = "col">
+            <a href = "{{url}}" class = "btn btn-link">{{name}}</a>
         </div>
+        {{#if (mod @index 4 3)}}
+        </div>
+        {{else if @last}}
+        </div>
+        {{/if}}
     {{/each}}
 </div>
