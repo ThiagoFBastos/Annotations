@@ -52,6 +52,10 @@ exports.AddAnnotation = asyncHandler(async (req, res, next) => {
         tags = [tags];
 
     tags = tags.map(id => new ObjectId(id));
+
+    if((await Tag.find({$and: [{user: req.session.user._id}, {_id: {$in: tags}}]}).count()) != tags.length)
+        throw new Error("Tentativa de inserção de uma tag inválida");
+
     let annotation = new Annotation({title: title, description: description, tags: tags, user: req.session.user._id});
     await annotation.save();
 
@@ -102,6 +106,10 @@ exports.Edit = asyncHandler(async (req, res, next) => {
         tags = [tags];
 
     tags = tags.map(id => new ObjectId(id));
+
+    if((await Tag.find({$and: [{user: req.session.user._id}, {_id: {$in: tags}}]}).count()) != tags.length)
+        throw new Error("Tentativa de inserção de uma tag inválida");
+
     await Annotation.findByIdAndUpdate(req.params.annotationId, {$set: {title: title, description: description, tags: tags}});
     
     let annotation = await Annotation.findById(req.params.annotationId).populate('tags');
